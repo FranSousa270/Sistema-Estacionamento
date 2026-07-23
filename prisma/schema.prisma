@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id     Int    @id @default(autoincrement())
+  nome   String
+  email  String @unique
+  senha  String
+}
+
+model Proprietario {
+  id        Int     @id @default(autoincrement())
+  nome      String
+  cpf       String  @unique
+  telefone  String?
+
+  carros    Carro[]
+}
+
+model Carro {
+  id              Int    @id @default(autoincrement())
+  modelo          String
+  placa           String @unique
+  ano             Int
+
+  proprietarioId  Int
+  proprietario    Proprietario @relation(fields: [proprietarioId], references: [id])
+
+  permanencias    Permanencia[]
+}
+
+model Setor {
+  id     Int    @id @default(autoincrement())
+  nome   String
+
+  vagas  Vaga[]
+}
+
+model Permanencia {
+  id          Int      @id @default(autoincrement())
+  entrada     DateTime @default(now())
+  saida       DateTime?
+
+  carroId     Int
+  carro       Carro    @relation(fields: [carroId], references: [id])
+
+  vagaId      Int
+  vaga        Vaga     @relation(fields: [vagaId], references: [id])
+}
+
+
+model Vaga {
+  id        Int      @id @default(autoincrement())
+  numero    String
+  tipo      TipoVaga
+
+  setorId   Int
+  setor     Setor @relation(fields: [setorId], references: [id])
+
+  permanencias Permanencia[]
+}
+
+enum TipoVaga {
+  COMUM
+  IDOSO
+  PCD
+  MOTO
+}
