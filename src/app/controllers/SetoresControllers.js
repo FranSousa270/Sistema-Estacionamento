@@ -3,10 +3,13 @@ import prisma from '../../../lib/prisma.js';
 class SetoresControllers{
 
    async index(req,res){
+    try{
         const data = await prisma.setor.findMany();
         res.status(200).json(data);
         console.log("GET :: /setores", JSON.stringify(data));
-    }
+    } catch(error){
+        message: "Erro interno no servidor"
+    }}
 
     async show(req,res){
         const data = await prisma.setor.findUnique({
