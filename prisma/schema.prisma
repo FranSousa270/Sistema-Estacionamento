@@ -38,6 +38,7 @@ model Carro {
 model Setor {
   id     Int    @id @default(autoincrement())
   nome   String
+  ativo     Boolean  @default(true)
 
   vagas  Vaga[]
 }
