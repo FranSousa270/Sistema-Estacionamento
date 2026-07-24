@@ -265,14 +265,13 @@ class CarrosControllers {
   }
 
   async destroy(req, res) {
-
-    const id = parseInt(id);
+    const id = parseInt(req.params.id);
     if (isNaN(id)) {
       return res.status(400).json({
         message: "Id inválido",
       });
     }
-    
+
     const carro = await prisma.carro.findUnique({
       where: {
         id,
@@ -286,15 +285,15 @@ class CarrosControllers {
     }
 
     const permanencia = await prisma.permanencia.findFirst({
-      where:{
-        carroId: id
-      }
-    })
+      where: {
+        carroId: id,
+      },
+    });
 
-    if(permanencia){
+    if (permanencia) {
       return res.status(409).json({
-        message: "Esse carro possui registros"
-      })
+        message: "Esse carro possui registros",
+      });
     }
 
     const data = await prisma.carro.delete({
@@ -302,7 +301,7 @@ class CarrosControllers {
         id,
       },
     });
-    res.json(data);
+    return res.json(data);
   }
 }
 
