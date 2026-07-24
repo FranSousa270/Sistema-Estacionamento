@@ -59,6 +59,7 @@ model Vaga {
   id        Int      @id @default(autoincrement())
   numero    String
   tipo      TipoVaga
+  ativa     Boolean  @default(true)
 
   setorId   Int
   setor     Setor @relation(fields: [setorId], references: [id])

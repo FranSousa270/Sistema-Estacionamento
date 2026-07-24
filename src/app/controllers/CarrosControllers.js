@@ -257,6 +257,17 @@ class CarrosControllers {
           message: "Essa placa já está cadastrada em outro veículo.",
         });
       }
+
+      const data = await prisma.carro.update({
+        where: {
+          id: parseInt(req.params.id),
+        },
+        data: {
+          modelo,
+          placa,
+          ano,
+        },
+      });
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
