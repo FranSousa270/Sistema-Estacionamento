@@ -18,7 +18,7 @@ model Proprietario {
   id        Int     @id @default(autoincrement())
   nome      String
   cpf       String  @unique
-  telefone  String?
+  telefone  String? @unique
 
   carros    Carro[]
 }

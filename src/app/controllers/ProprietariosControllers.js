@@ -15,7 +15,7 @@ class ProprietariosControllers {
 
   async show(req, res) {
     try {
-      const id = parseInt(id);
+      const id = parseInt(req.params.id);
       if (isNaN(id)) {
         return res.status(400).json({
           message: "Id inválido",
@@ -124,13 +124,13 @@ class ProprietariosControllers {
         });
       }
 
-      telefone = telefone.trim();
-
-      if (telefone.length <= 12) {
+      if (telefone.length <= 11) {
         return res.status(400).json({
           message: "O campo deve ter no minímo 10 carácteres",
         });
       }
+
+      telefone = telefone.trim();
 
       if (!regex.test(telefone)) {
         return res.status(400).json({
@@ -183,7 +183,7 @@ class ProprietariosControllers {
       });
 
       if (!proprietario) {
-        res.status(404).json({
+        return res.status(404).json({
           message: "Proprietário não encontrado",
         });
       }
@@ -306,6 +306,7 @@ class ProprietariosControllers {
       });
       return res.status(200).json(data);
     } catch (error) {
+
       return res.status(500).json({
         message: "Erro interno no servidor",
       });
@@ -340,7 +341,7 @@ class ProprietariosControllers {
         },
       });
 
-      const carrosProprietario = carros.map(() => carro.id);
+      const carrosProprietario = carros.map(() => carros.id);
 
       const excluirPermanencia = await prisma.permanencia.deleteMany({
         where: {
