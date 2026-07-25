@@ -58,7 +58,7 @@ class SetoresControllers {
         });
       }
 
-      nome = nome.trim();
+      nome = nome.trim().toUpperCase();
 
       const data = await prisma.setor.create({
         data: {
@@ -67,6 +67,7 @@ class SetoresControllers {
       });
       res.status(201).json(data);
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         message: "Erro interno no servidor",
       });
@@ -108,7 +109,7 @@ class SetoresControllers {
         });
       }
 
-      nome = nome.trim();
+      nome = nome.trim().toUpperCase();
 
       if (nome.length < 1) {
         return res.status(400).json({
@@ -207,12 +208,27 @@ class SetoresControllers {
       });
 
       return res.status(200).json(data);
-
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
       });
     }
+  }
+
+  async patch(req, res) {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({
+        message: "Id inválido",
+      });
+    }
+    const data = await prisma.setor.update({
+      where: { id },
+      data: {
+        ativo: true,
+      },
+    });
+    return res.status(200).json(data);
   }
 }
 

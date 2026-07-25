@@ -26,16 +26,19 @@ routes.put('/usuarios/:id', (req, res) => usuarios.update(req, res));
 routes.post('/usuarios', (req, res) => usuarios.create(req, res));
 routes.delete('/usuarios/:id', (req, res) => usuarios.destroy(req, res));
 
+
 routes.get('/setores', (req, res) => setores.index(req, res));
 routes.get('/setores/:id', (req, res) => setores.show(req, res));
 routes.put('/setores/:id', (req, res) => setores.update(req, res));
 routes.post('/setores', (req, res) => setores.create(req, res));
 routes.delete('/setores/:id', (req, res) => setores.destroy(req, res));
+routes.patch('/setores/:id/ativar', (req, res) => setores.patch(req, res));
 
 routes.get('/vagas', (req, res) => vagas.index(req, res));
 routes.get('/vagas/:id', (req, res) => vagas.show(req, res));
 routes.put('/vagas/:id', (req, res) => vagas.update(req, res));
 routes.post('/vagas', (req, res) => vagas.create(req, res));
 routes.delete('/vagas/:id', (req, res) => vagas.destroy(req, res));
+routes.patch('/vagas/:id/ativar', (req, res) => vagas.patch(req, res));
 
 export default routes;
