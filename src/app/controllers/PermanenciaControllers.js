@@ -57,7 +57,7 @@ class PermanenciaControllers {
       veiculoId = parseInt(veiculoId);
       vagaId = parseInt(vagaId);
 
-      if (isNaN(carroId)) {
+      if (isNaN(veiculoId)) {
         return res.status(400).json({
           message: "Id inválido.",
         });
@@ -67,7 +67,7 @@ class PermanenciaControllers {
         where: { id: veiculoId },
       });
 
-      if (veiculo) {
+      if (!veiculo) {
         return res.status(404).json({
           message: "Veículo não encontrado.",
         });

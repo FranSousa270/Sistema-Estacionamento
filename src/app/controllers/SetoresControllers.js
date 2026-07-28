@@ -162,7 +162,7 @@ class SetoresControllers {
 
       let vagasIds = vagas.map((vaga) => vaga.id);
 
-      if (vagas.length === 1) {
+      if (vagas.length === 0) {
         const data = await prisma.setor.update({
           where: {
             id: parseInt(req.params.id),
@@ -174,7 +174,7 @@ class SetoresControllers {
         return res.status(200).json(data);
       }
 
-      const carroEstacionado = await prisma.permanencia.findFirst({
+      const veiculoEstacionado = await prisma.permanencia.findFirst({
         where: {
           vagaId: {
             in: vagasIds,
@@ -183,7 +183,7 @@ class SetoresControllers {
         },
       });
 
-      if (carroEstacionado) {
+      if (veiculoEstacionado) {
         return res.status(400).json({
           message: "Não é possível desativar um setor com vagas ocupadas",
         });
