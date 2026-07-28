@@ -1,4 +1,5 @@
 import prisma from "../../../lib/prisma.js";
+import { createPermanenciaSchema } from "../validations/permanencias.schema.js";
 
 class PermanenciaControllers {
   async index(req, res) {
@@ -30,7 +31,7 @@ class PermanenciaControllers {
 
       const data = await prisma.permanencia.findUnique({
         where: {
-          id: parseInt(req.params.id),
+          id,
         },
         include: {
           veiculo: true,
@@ -52,19 +53,20 @@ class PermanenciaControllers {
 
   async create(req, res) {
     try {
-      let { veiculoId, vagaId } = req.body;
+      const resultado = createPermanenciaSchema.safeParse(req.body);
 
-      veiculoId = parseInt(veiculoId);
-      vagaId = parseInt(vagaId);
-
-      if (isNaN(veiculoId)) {
+      if (!resultado.success) {
         return res.status(400).json({
-          message: "Id inválido.",
+          errors: resultado.error.flatten().fieldErrors,
         });
       }
 
+      const dados = resultado.data;
+
       const veiculo = await prisma.veiculo.findUnique({
-        where: { id: veiculoId },
+        where: {
+          id: dados.veiculoId,
+        },
       });
 
       if (!veiculo) {
@@ -73,15 +75,21 @@ class PermanenciaControllers {
         });
       }
 
-      if (isNaN(vagaId)) {
+      const setor = await prisma.setor.findUnique({
+        where: {
+          id: vaga.setorId,
+        },
+      });
+
+      if (!setor.ativo) {
         return res.status(400).json({
-          message: "Id inválido.",
+          message: "O setor desta vaga está inativo.",
         });
       }
 
       const vaga = await prisma.vaga.findUnique({
         where: {
-          id: vagaId,
+          id: dados.vagaId,
         },
       });
 
@@ -99,7 +107,7 @@ class PermanenciaControllers {
 
       const veiculoEstacionado = await prisma.permanencia.findFirst({
         where: {
-          veiculoId,
+          veiculoId: dados.veiculoId,
           saida: null,
         },
       });
@@ -112,7 +120,7 @@ class PermanenciaControllers {
 
       const vagaOcupada = await prisma.permanencia.findFirst({
         where: {
-          vagaId,
+          vagaId: dados.vagaId,
           saida: null,
         },
       });
@@ -125,8 +133,8 @@ class PermanenciaControllers {
 
       const data = await prisma.permanencia.create({
         data: {
-          veiculoId,
-          vagaId,
+          veiculoId: dados.veiculoId,
+          vagaId: dados.vagaId,
         },
         include: {
           veiculo: true,
@@ -174,6 +182,10 @@ class PermanenciaControllers {
         },
         data: {
           saida: new Date(),
+        },
+        include: {
+          veiculo: true,
+          vaga: true,
         },
       });
 

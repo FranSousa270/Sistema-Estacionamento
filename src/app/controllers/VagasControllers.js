@@ -1,5 +1,4 @@
 import { safeParse } from "zod";
-import { TipoVaga } from "../../../generated/prisma/enums.ts";
 import prisma from "../../../lib/prisma.js";
 import { createVagaSchema } from "../validations/vagas.schema.js";
 
