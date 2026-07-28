@@ -1,5 +1,7 @@
+import { safeParse } from "zod";
 import { TipoVaga } from "../../../generated/prisma/enums.ts";
 import prisma from "../../../lib/prisma.js";
+import { createVagaSchema } from "../validations/vagas.schema.js";
 
 class VagasControllers {
   async index(req, res) {
@@ -44,64 +46,19 @@ class VagasControllers {
 
   async create(req, res) {
     try {
-      let { numero, tipo, setorId } = req.body;
+      const resultado = createVagaSchema.safeParse(req.body);
 
-
-      if (!numero) {
+      if (!resultado.success) {
         return res.status(400).json({
-          message: "O numero da vaga deve ser preenchido",
+          errors: resultado.error.flatten().fieldErrors,
         });
       }
 
-      if (typeof numero !== "string") {
-        return res.status(400).json({
-          message: "Escreva uma vaga válida",
-        });
-      }
-
-      numero = numero.trim();
-
-      if (numero.length < 1) {
-        return res.status(400).json({
-          message: "A vaga deve ter pelo menos 1 caractere",
-        });
-      }
-
-      if (!tipo) {
-        res.status(400).json({
-          message: "O tipo da vaga deve ser preenchido",
-        });
-      }
-
-      if (typeof tipo !== "string") {
-        return res.status(400).json({
-          message: "Insira uma vaga válida",
-        });
-      }
-
-      if (!Object.values(TipoVaga).includes(tipo)) {
-        return res.status(400).json({
-          message: "Tipo não é válido",
-        });
-      }
-
-      if (!setorId) {
-        return res.status(400).json({
-          message: "Insira o setor",
-        });
-      }
-
-      setorId = parseInt(setorId);
-
-      if (isNaN(setorId)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const dados = resultado.data;
 
       const setorExistente = await prisma.setor.findUnique({
         where: {
-          id: setorId,
+          id: dados.setorId,
         },
       });
 
@@ -112,13 +69,9 @@ class VagasControllers {
       }
 
       const data = await prisma.vaga.create({
-        data: {
-          numero,
-          tipo,
-          setorId,
-        },
+        data: dados,
       });
-      res.status(201).json(data);
+      return res.status(201).json(data);
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
@@ -128,8 +81,6 @@ class VagasControllers {
 
   async update(req, res) {
     try {
-      let { numero, tipo, setorId } = req.body;
-
       const id = parseInt(req.params.id);
 
       if (isNaN(id)) {
@@ -150,61 +101,19 @@ class VagasControllers {
         });
       }
 
-      if (!numero) {
+      const resultado = createVagaSchema.safeParse(req.body);
+
+      if (!resultado.success) {
         return res.status(400).json({
-          message: "O numero da vaga deve ser preenchido",
+          errors: resultado.error.flatten().fieldErrors,
         });
       }
 
-      if (typeof numero !== "string") {
-        return res.status(400).json({
-          message: "Escreva uma vaga válida",
-        });
-      }
-
-      numero = numero.trim();
-
-      if (numero.length < 1) {
-        return res.status(400).json({
-          message: "A vaga deve ter pelo menos 1 caractere",
-        });
-      }
-
-      if (!tipo) {
-        res.status(400).json({
-          message: "O tipo da vaga deve ser preenchido",
-        });
-      }
-
-      if (typeof tipo !== "string") {
-        return res.status(400).json({
-          message: "Insira uma vaga válida",
-        });
-      }
-
-      if (!Object.values(TipoVaga).includes(tipo)) {
-        return res.status(400).json({
-          message: "Tipo não é válido",
-        });
-      }
-
-      if (!setorId) {
-        return res.status(400).json({
-          message: "Insira o setor",
-        });
-      }
-
-      setorId = parseInt(setorId);
-
-      if (isNaN(setorId)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const dados = resultado.data;
 
       const setorExistente = await prisma.setor.findUnique({
         where: {
-          id: setorId,
+          id: dados.setorId,
         },
       });
 
@@ -216,15 +125,11 @@ class VagasControllers {
 
       const data = await prisma.vaga.update({
         where: {
-          id: parseInt(req.params.id),
+          id,
         },
-        data: {
-          numero,
-          tipo,
-          setorId,
-        },
+        data: dados,
       });
-      res.status(200).json(data);
+      return res.status(200).json(data);
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
@@ -276,7 +181,7 @@ class VagasControllers {
           ativa: false,
         },
       });
-      res.status(200).json(data);
+      return res.status(200).json(data);
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
@@ -285,44 +190,56 @@ class VagasControllers {
   }
 
   async patch(req, res) {
-    const id = parseInt(req.params.id);
+    try {
+      const id = parseInt(req.params.id);
 
-    if (isNaN(id)) {
-      return res.status(400).json({
-        message: "Id inválido",
+      if (isNaN(id)) {
+        return res.status(400).json({
+          message: "Id inválido",
+        });
+      }
+
+      const vaga = await prisma.vaga.findUnique({
+        where: { id },
+      });
+
+      if (!vaga) {
+        return res.status(404).json({
+          message: "Vaga não encontrada",
+        });
+      }
+
+      const setor = await prisma.setor.findUnique({
+        where: {
+          id: vaga.setorId,
+        },
+      });
+
+      if (!setor) {
+        return res.status(404).json({
+          message: "Setor não encontrado",
+        });
+      }
+
+      if (!setor.ativo) {
+        return res.status(400).json({
+          message: "Não é possível ativar uma vaga de um setor inativo.",
+        });
+      }
+
+      const data = await prisma.vaga.update({
+        where: { id },
+        data: {
+          ativa: true,
+        },
+      });
+
+      return res.status(200).json(data);
+    } catch (error) {
+      return res.status(500).json({
+        message: "Erro interno no servidor.",
       });
     }
-
-    const vaga = await prisma.vaga.findUnique({
-      where: { id },
-    });
-
-    if (!vaga) {
-      return res.status(404).json({
-        message: "Vaga não encontrada",
-      });
-    }
-
-    const setor = await prisma.setor.findUnique({
-      where: {
-        id: vaga.setorId,
-      },
-    });
-
-    if (!setor.ativo) {
-      return res.status(400).json({
-        message: "Não é possível ativar uma vaga de um setor inativo.",
-      });
-    }
-
-    const data = await prisma.vaga.update({
-      where: { id },
-      data: {
-        ativa: true,
-      },
-    });
-
-    return res.status(200).json(data);
   }
 }
 export default new VagasControllers();
