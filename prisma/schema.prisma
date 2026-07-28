@@ -20,10 +20,10 @@ model Proprietario {
   cpf       String  @unique
   telefone  String? @unique
 
-  carros    Carro[]
+  veiculos    Veiculo[]
 }
 
-model Carro {
+model Veiculo {
   id              Int    @id @default(autoincrement())
   modelo          String
   placa           String @unique
@@ -48,8 +48,8 @@ model Permanencia {
   entrada     DateTime @default(now())
   saida       DateTime?
 
-  carroId     Int
-  carro       Carro    @relation(fields: [carroId], references: [id])
+  veiculoId     Int
+  veiculo       Veiculo    @relation(fields: [veiculoId], references: [id])
 
   vagaId      Int
   vaga        Vaga     @relation(fields: [vagaId], references: [id])
@@ -69,7 +69,7 @@ model Vaga {
 }
 
 enum TipoVaga {
-  COMUM
+  CARRO
   IDOSO
   PCD
   MOTO

@@ -1,11 +1,11 @@
 import prisma from "../../../lib/prisma.js";
 
-class CarrosControllers {
+class VeiculosControllers {
   async index(req, res) {
     try {
-      const data = await prisma.carro.findMany();
+      const data = await prisma.veiculo.findMany();
       res.status(200).json(data);
-      console.log("GET :: /carros", JSON.stringify(data));
+      console.log("GET :: /veiculos", JSON.stringify(data));
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
@@ -19,20 +19,20 @@ class CarrosControllers {
       if (isNaN(id)) {
         return res.status(400).json({
           message:
-            "Carro não encontrado, tente novamente com um id existente ou válido",
+            "Veículo não encontrado, tente novamente com um id existente ou válido",
         });
       }
-      const carro = await prisma.carro.findUnique({
+      const veiculo = await prisma.veiculo.findUnique({
         where: {
           id,
         },
       });
-      if (!carro) {
+      if (!veiculo) {
         return res.status(404).json({
           message: "Veículo não encontrado",
         });
       }
-      return res.status(200).json(carro);
+      return res.status(200).json(veiculo);
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
@@ -103,7 +103,7 @@ class CarrosControllers {
       });
     }
 
-    const placaExistente = await prisma.carro.findUnique({
+    const placaExistente = await prisma.veiculo.findUnique({
       where: {
         placa,
       },
@@ -140,7 +140,7 @@ class CarrosControllers {
     }
 
     try {
-      const carro = await prisma.carro.create({
+      const veiculo = await prisma.veiculo.create({
         data: {
           modelo,
           ano,
@@ -149,7 +149,7 @@ class CarrosControllers {
         },
       });
       res.status(201);
-      res.json({ carro });
+      res.json({ veiculo });
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
@@ -168,15 +168,15 @@ class CarrosControllers {
         });
       }
 
-      const carro = await prisma.carro.findUnique({
+      const veiculo = await prisma.veiculo.findUnique({
         where: {
           id,
         },
       });
 
-      if (!carro) {
+      if (!veiculo) {
         return res.status(400).json({
-          message: "Carro não encontrado",
+          message: "Veículo não encontrado",
         });
       }
 
@@ -240,7 +240,7 @@ class CarrosControllers {
         });
       }
 
-      const placaExistente = await prisma.carro.findUnique({
+      const placaExistente = await prisma.veiculo.findUnique({
         where: {
           placa,
         },
@@ -252,13 +252,13 @@ class CarrosControllers {
         });
       }
 
-      if (placaExistente && placaExistente.id !== carro.id) {
+      if (placaExistente && placaExistente.id !== veiculo.id) {
         return res.status(400).json({
           message: "Essa placa já está cadastrada em outro veículo.",
         });
       }
 
-      const data = await prisma.carro.update({
+      const data = await prisma.veiculo.update({
         where: {
           id: parseInt(req.params.id),
         },
@@ -268,6 +268,7 @@ class CarrosControllers {
           ano,
         },
       });
+      return res.status(200).json(data)
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
@@ -283,13 +284,13 @@ class CarrosControllers {
       });
     }
 
-    const carro = await prisma.carro.findUnique({
+    const veiculo = await prisma.veiculo.findUnique({
       where: {
         id,
       },
     });
 
-    if (!carro) {
+    if (!veiculo) {
       return res.status(404).json({
         message: "Carro não encontrado",
       });
@@ -297,17 +298,17 @@ class CarrosControllers {
 
     const permanencia = await prisma.permanencia.findFirst({
       where: {
-        carroId: id,
+        veiculoId: id,
       },
     });
 
     if (permanencia) {
       return res.status(409).json({
-        message: "Esse carro possui registros",
+        message: "Esse veículo possui registros",
       });
     }
 
-    const data = await prisma.carro.delete({
+    const data = await prisma.veiculo.delete({
       where: {
         id,
       },
@@ -316,4 +317,4 @@ class CarrosControllers {
   }
 }
 
-export default new CarrosControllers();
+export default new VeiculosControllers();

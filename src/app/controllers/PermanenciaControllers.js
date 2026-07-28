@@ -5,7 +5,7 @@ class PermanenciaControllers {
     try {
       const data = await prisma.permanencia.findMany({
         include: {
-          carro: true,
+          veiculo: true,
           vaga: true,
         },
       });
@@ -33,7 +33,7 @@ class PermanenciaControllers {
           id: parseInt(req.params.id),
         },
         include: {
-          carro: true,
+          veiculo: true,
           vaga: true,
         },
       });
@@ -52,9 +52,9 @@ class PermanenciaControllers {
 
   async create(req, res) {
     try {
-      let { carroId, vagaId } = req.body;
+      let { veiculoId, vagaId } = req.body;
 
-      carroId = parseInt(carroId);
+      veiculoId = parseInt(veiculoId);
       vagaId = parseInt(vagaId);
 
       if (isNaN(carroId)) {
@@ -63,13 +63,13 @@ class PermanenciaControllers {
         });
       }
 
-      const carro = await prisma.carro.findUnique({
-        where: { id: carroId },
+      const veiculo = await prisma.veiculo.findUnique({
+        where: { id: veiculoId },
       });
 
-      if (!carro) {
+      if (veiculo) {
         return res.status(404).json({
-          message: "Carro não encontrado.",
+          message: "Veículo não encontrado.",
         });
       }
 
@@ -97,16 +97,16 @@ class PermanenciaControllers {
         });
       }
 
-      const carroEstacionado = await prisma.permanencia.findFirst({
+      const veiculoEstacionado = await prisma.permanencia.findFirst({
         where: {
-          carroId,
+          veiculoId,
           saida: null,
         },
       });
 
-      if (carroEstacionado) {
+      if (veiculoEstacionado) {
         return res.status(400).json({
-          message: "Este carro já está estacionado.",
+          message: "Este veículo já está estacionado.",
         });
       }
 
@@ -125,11 +125,11 @@ class PermanenciaControllers {
 
       const data = await prisma.permanencia.create({
         data: {
-          carroId,
+          veiculoId,
           vagaId,
         },
         include: {
-          carro: true,
+          veiculo: true,
           vaga: true,
         },
       });

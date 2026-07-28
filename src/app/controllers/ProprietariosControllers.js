@@ -335,26 +335,26 @@ class ProprietariosControllers {
         });
       }
 
-      const carros = await prisma.carro.findMany({
+      const veiculos = await prisma.veiculo.findMany({
         where: {
           proprietarioId: id,
         },
       });
 
-      const carrosProprietario = carros.map(() => carros.id);
+      const veiculosProprietario = veiculos.map(() => veiculos.id);
 
       const excluirPermanencia = await prisma.permanencia.deleteMany({
         where: {
-          carroId: {
-            in: carrosProprietario,
+          veiculoIdId: {
+            in: veiculosProprietario,
           },
         },
       });
 
-      const excluirCarros = await prisma.carro.deleteMany({
+      const excluirVeiculos = await prisma.veiculo.deleteMany({
         where: {
           id: {
-            in: carrosProprietario,
+            in: veiculosProprietario,
           },
         },
       });

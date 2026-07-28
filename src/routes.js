@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import carros from "./app/controllers/CarrosControllers.js";
+import veiculos from "./app/controllers/VeiculosControllers.js";
 import proprietarios from "./app/controllers/ProprietariosControllers.js";
 import usuarios from "./app/controllers/UsuariosControllers.js";
 import setores from "./app/controllers/SetoresControllers.js";
@@ -8,11 +8,11 @@ import permanencias from "./app/controllers/PermanenciaControllers.js"
 
 const routes = new Router();
 
-routes.get('/carros', (req, res) => carros.index(req, res));
-routes.get('/carros/:id', (req, res) => carros.show(req, res));
-routes.post('/carros', (req, res) => carros.create(req, res));
-routes.put('/carros/:id', (req, res) => carros.update(req, res));
-routes.delete('/carros/:id', (req, res) => carros.destroy(req, res));
+routes.get('/veiculos', (req, res) => veiculos.index(req, res));
+routes.get('/veiculos/:id', (req, res) => veiculos.show(req, res));
+routes.post('/veiculos', (req, res) => veiculos.create(req, res));
+routes.put('/veiculos/:id', (req, res) => veiculos.update(req, res));
+routes.delete('/veiculos/:id', (req, res) => veiculos.destroy(req, res));
 
 routes.get('/proprietarios', (req, res) => proprietarios.index(req, res));
 routes.get('/proprietarios/:id', (req, res) => proprietarios.show(req, res));
