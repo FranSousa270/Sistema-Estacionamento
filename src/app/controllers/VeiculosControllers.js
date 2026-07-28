@@ -292,7 +292,7 @@ class VeiculosControllers {
 
     if (!veiculo) {
       return res.status(404).json({
-        message: "Carro não encontrado",
+        message: "Veículo não encontrado",
       });
     }
 
