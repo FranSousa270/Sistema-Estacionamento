@@ -41,6 +41,8 @@ class VeiculosControllers {
   }
 
   async create(req, res) {
+
+    
     let { modelo, ano, placa, proprietarioId } = req.body;
 
     if (!modelo) {
