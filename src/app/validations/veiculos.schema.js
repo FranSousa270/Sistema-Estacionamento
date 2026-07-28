@@ -6,3 +6,4 @@ export const createVeiculoSchema = z.object({
     ano: z.number().min(1900).max(new Date().getFullYear() + 1),
     proprietarioId: z.number().int().positive()
 })
+

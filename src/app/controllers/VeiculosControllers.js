@@ -1,5 +1,5 @@
 import prisma from "../../../lib/prisma.js";
-import { createVeiculoSchema } from "../validations/veiculo.schema.js";
+import { createVeiculoSchema } from "../validations/veiculos.schema.js";
 
 class VeiculosControllers {
   async index(req, res) {
@@ -90,14 +90,22 @@ class VeiculosControllers {
 
   async update(req, res) {
     try {
-      let { modelo, ano, placa } = req.body;
-      let id = parseInt(req.params.id);
+      const id = parseInt(req.params.id);
 
       if (isNaN(id)) {
         return res.status(400).json({
-          message: "O id é invalido",
+          message: "Id inválido",
         });
       }
+      const resultado = createVeiculoSchema.safeParse(req.body);
+
+      if (!resultado.success) {
+        return res.status(400).json({
+          errors: resultado.error.flatten().fieldErrors,
+        });
+      }
+
+      const dados = resultado.data;
 
       const veiculo = await prisma.veiculo.findUnique({
         where: {
@@ -111,77 +119,11 @@ class VeiculosControllers {
         });
       }
 
-      if (!modelo) {
-        return res.status(400).json({
-          message: "O campo modelo é obrigatório",
-        });
-      }
-
-      if (typeof modelo !== "string") {
-        return res.status(400).json({
-          message: "O modelo deve ser um texto",
-        });
-      }
-
-      modelo = modelo.trim();
-
-      if (modelo.length < 2) {
-        return res.status(400).json({
-          message: "O campo modelo não pode conter menos que 2 letras",
-        });
-      }
-
-      if (!ano) {
-        return res.status(400).json({
-          message: "O campo ano é obrigatório",
-        });
-      }
-
-      if (!Number.isInteger(ano)) {
-        return res.status(400).json({
-          message: "Escreva números inteiros",
-        });
-      }
-
-      const anoMaximo = new Date().getFullYear() + 1;
-
-      if (ano < 1930 || ano > anoMaximo) {
-        return res.status(400).json({
-          message: "Coloque um ano válido",
-        });
-      }
-
-      if (!placa) {
-        return res.status(400).json({
-          message: "O campo placa não pode estar vazio",
-        });
-      }
-
-      if (typeof placa !== "string") {
-        return res.status(400).json({
-          message: "Escreva apenas uma placa válida",
-        });
-      }
-
-      placa = placa.trim().toUpperCase();
-
-      if (placa.length < 7) {
-        return res.status(400).json({
-          message: "O campo placa deve conter pelo menos 7 caracteres",
-        });
-      }
-
       const placaExistente = await prisma.veiculo.findUnique({
         where: {
-          placa,
+          placa: dados.placa,
         },
       });
-
-      if (placaExistente) {
-        return res.status(400).json({
-          message: "Essa placa já existe",
-        });
-      }
 
       if (placaExistente && placaExistente.id !== veiculo.id) {
         return res.status(400).json({
@@ -191,13 +133,9 @@ class VeiculosControllers {
 
       const data = await prisma.veiculo.update({
         where: {
-          id: parseInt(req.params.id),
+          id,
         },
-        data: {
-          modelo,
-          placa,
-          ano,
-        },
+        data: dados
       });
       return res.status(200).json(data);
     } catch (error) {
