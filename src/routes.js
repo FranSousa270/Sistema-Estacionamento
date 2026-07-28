@@ -4,12 +4,12 @@ import proprietarios from "./app/controllers/ProprietariosControllers.js";
 import usuarios from "./app/controllers/UsuariosControllers.js";
 import setores from "./app/controllers/SetoresControllers.js";
 import vagas from "./app/controllers/VagasControllers.js";
+import permanencias from "./app/controllers/PermanenciaControllers.js"
 
 const routes = new Router();
 
 routes.get('/carros', (req, res) => carros.index(req, res));
 routes.get('/carros/:id', (req, res) => carros.show(req, res));
-routes.get('/modelos', (req, res) => carros.showModelo(req, res));
 routes.post('/carros', (req, res) => carros.create(req, res));
 routes.put('/carros/:id', (req, res) => carros.update(req, res));
 routes.delete('/carros/:id', (req, res) => carros.destroy(req, res));
@@ -40,5 +40,11 @@ routes.put('/vagas/:id', (req, res) => vagas.update(req, res));
 routes.post('/vagas', (req, res) => vagas.create(req, res));
 routes.delete('/vagas/:id', (req, res) => vagas.destroy(req, res));
 routes.patch('/vagas/:id/ativar', (req, res) => vagas.patch(req, res));
+
+routes.get('/permanencias', (req, res) => permanencias.index(req, res));
+routes.get('/permanencias/:id', (req, res) => permanencias.show(req, res));
+routes.put('/permanencias/:id', (req, res) => permanencias.finalizar(req, res));
+routes.post('/permanencias', (req, res) => permanencias.create(req, res));
+
 
 export default routes;
