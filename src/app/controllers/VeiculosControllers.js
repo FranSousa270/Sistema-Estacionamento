@@ -1,4 +1,5 @@
 import prisma from "../../../lib/prisma.js";
+import { createVeiculoSchema } from "../validations/veiculo.schema.js";
 
 class VeiculosControllers {
   async index(req, res) {
@@ -41,117 +42,45 @@ class VeiculosControllers {
   }
 
   async create(req, res) {
-
-    
-    let { modelo, ano, placa, proprietarioId } = req.body;
-
-    if (!modelo) {
-      return res.status(400).json({
-        message: "O campo modelo é obrigatório",
-      });
-    }
-
-    if (typeof modelo !== "string") {
-      return res.status(400).json({
-        message: "O modelo deve ser um texto",
-      });
-    }
-
-    modelo = modelo.trim();
-
-    if (modelo.length < 2) {
-      return res.status(400).json({
-        message: "O campo modelo não pode conter menos que 2 letras",
-      });
-    }
-
-    if (!ano) {
-      return res.status(400).json({
-        message: "O campo ano é obrigatório",
-      });
-    }
-
-    if (!Number.isInteger(ano)) {
-      return res.status(400).json({
-        message: "Escreva números inteiros",
-      });
-    }
-
-    const anoMaximo = new Date().getFullYear() + 1;
-
-    if (ano < 1930 || ano > anoMaximo) {
-      return res.status(400).json({
-        message: "Coloque um ano válido",
-      });
-    }
-
-    if (!placa) {
-      return res.status(400).json({
-        message: "O campo placa não pode estar vazio",
-      });
-    }
-
-    if (typeof placa !== "string") {
-      return res.status(400).json({
-        message: "Escreva apenas uma placa válida",
-      });
-    }
-
-    placa = placa.trim().toUpperCase();
-
-    if (placa.length < 7) {
-      return res.status(400).json({
-        message: "O campo placa deve conter pelo menos 7 caracteres",
-      });
-    }
-
-    const placaExistente = await prisma.veiculo.findUnique({
-      where: {
-        placa,
-      },
-    });
-
-    if (placaExistente) {
-      return res.status(400).json({
-        message: "Essa placa já existe",
-      });
-    }
-
-    if (!proprietarioId) {
-      return res.status(400).json({
-        message: "O proprietário é obrigatório.",
-      });
-    }
-
-    if (isNaN(proprietarioId)) {
-      return res.status(400).json({
-        message: "O ID não é válido",
-      });
-    }
-
-    const proprietario = await prisma.proprietario.findUnique({
-      where: {
-        id: proprietarioId,
-      },
-    });
-
-    if (!proprietario) {
-      return res.status(404).json({
-        message: "Esse ID não existe",
-      });
-    }
-
     try {
-      const veiculo = await prisma.veiculo.create({
-        data: {
-          modelo,
-          ano,
-          placa,
-          proprietarioId,
+      const resultado = createVeiculoSchema.safeParse(req.body);
+
+      if (!resultado.success) {
+        return res.status(400).json({
+          errors: resultado.error.flatten().fieldErrors,
+        });
+      }
+
+      const dados = resultado.data;
+
+      const placaExistente = await prisma.veiculo.findUnique({
+        where: {
+          placa: dados.placa,
         },
       });
-      res.status(201);
-      res.json({ veiculo });
+
+      if (placaExistente) {
+        return res.status(400).json({
+          message: "Essa placa já existe",
+        });
+      }
+
+      const proprietario = await prisma.proprietario.findUnique({
+        where: {
+          id: dados.proprietarioId,
+        },
+      });
+
+      if (!proprietario) {
+        return res.status(404).json({
+          message: "Esse ID não existe",
+        });
+      }
+
+      const veiculo = await prisma.veiculo.create({
+        data: dados,
+      });
+      res.status(201).json(veiculo);
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
@@ -270,7 +199,7 @@ class VeiculosControllers {
           ano,
         },
       });
-      return res.status(200).json(data)
+      return res.status(200).json(data);
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
