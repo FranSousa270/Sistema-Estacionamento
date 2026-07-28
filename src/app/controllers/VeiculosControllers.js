@@ -1,5 +1,5 @@
 import prisma from "../../../lib/prisma.js";
-import { createVeiculoSchema } from "../validations/veiculos.schema.js";
+import { createVeiculoSchema, updateVeiculoSchema } from "../validations/veiculos.schema.js";
 
 class VeiculosControllers {
   async index(req, res) {
@@ -97,7 +97,7 @@ class VeiculosControllers {
           message: "Id inválido",
         });
       }
-      const resultado = createVeiculoSchema.safeParse(req.body);
+      const resultado = updateVeiculoSchema.safeParse(req.body);
 
       if (!resultado.success) {
         return res.status(400).json({

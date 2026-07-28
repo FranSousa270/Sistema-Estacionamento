@@ -7,3 +7,11 @@ export const createVeiculoSchema = z.object({
     proprietarioId: z.number().int().positive()
 })
 
+export const updateVeiculoSchema = z.object({
+    placa: z.string().trim().length(7, "A placa deve conter 7 carácteres.").transform((placa) => placa.toUpperCase()),
+    modelo: z.string().trim().min(2, "O modelo deve ter no minímo 2 carácteres."),
+    ano: z.number().min(1900).max(new Date().getFullYear() + 1)
+})
+
+
+

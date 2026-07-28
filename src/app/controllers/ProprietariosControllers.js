@@ -1,4 +1,5 @@
 import prisma from "../../../lib/prisma.js";
+import { createProprietarioSchema } from "../validations/proprietarios.schema.js";
 
 class ProprietariosControllers {
   async index(req, res) {
@@ -42,67 +43,19 @@ class ProprietariosControllers {
 
   async create(req, res) {
     try {
-      let { nome, cpf, telefone } = req.body;
+      const resultado = createProprietarioSchema.safeParse(req.body);
 
-      if (!nome) {
+      if (!resultado.success) {
         return res.status(400).json({
-          message: "O campo nome deve ser preenchido",
+          errors: resultado.error.flatten().fieldErrors,
         });
       }
 
-      if (typeof nome !== "string") {
-        return res.status(400).json({
-          message: "O campo nome deve ser preenchido apenas por letras",
-        });
-      }
-
-      nome = nome.trim();
-
-      if (nome.length < 2) {
-        return res.status(400).json({
-          message: "O campo nome deve ter pelo menos 2 letras",
-        });
-      }
-
-      const regexNome = /^[\p{L} ]+$/u;
-
-      if (!regexNome.test(nome)) {
-        return res.status(400).json({
-          message: "Escreva apenas letras",
-        });
-      }
-
-      if (!cpf) {
-        return res.status(400).json({
-          message: "O campo cpf deve ser preenchido",
-        });
-      }
-
-      if (typeof cpf !== "string") {
-        return res.status(400).json({
-          message: "Digite um cpf válido",
-        });
-      }
-
-      cpf = cpf.trim();
-
-      const regex = /^\d+$/;
-
-      if (!regex.test(cpf)) {
-        return res.status(400).json({
-          message: "O campo cpf deve ter apenas números",
-        });
-      }
-
-      if (cpf.length !== 11) {
-        return res.status(400).json({
-          message: "O campo cpf deve ter 11 digítos",
-        });
-      }
+      const dados = resultado.data;
 
       const cpfExistente = await prisma.proprietario.findUnique({
         where: {
-          cpf,
+          cpf: dados.cpf,
         },
       });
 
@@ -112,35 +65,9 @@ class ProprietariosControllers {
         });
       }
 
-      if (!telefone) {
-        return res.status(400).json({
-          message: "O campo telefone deve preenchido",
-        });
-      }
-
-      if (typeof telefone !== "string") {
-        return res.status(400).json({
-          message: "Digite um telefone válido",
-        });
-      }
-
-      if (telefone.length <= 11) {
-        return res.status(400).json({
-          message: "O campo deve ter no minímo 10 carácteres",
-        });
-      }
-
-      telefone = telefone.trim();
-
-      if (!regex.test(telefone)) {
-        return res.status(400).json({
-          message: "Escreva apenas numeros",
-        });
-      }
-
       const telefoneExistente = await prisma.proprietario.findUnique({
         where: {
-          telefone,
+          telefone: dados.telefone,
         },
       });
 
@@ -151,13 +78,9 @@ class ProprietariosControllers {
       }
 
       const proprietario = await prisma.proprietario.create({
-        data: {
-          nome,
-          cpf,
-          telefone,
-        },
+        data: dados,
       });
-      res.status(201).json(proprietario);
+      return res.status(201).json(proprietario);
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
@@ -167,7 +90,6 @@ class ProprietariosControllers {
 
   async update(req, res) {
     try {
-      let { nome, cpf, telefone } = req.body;
       const id = parseInt(req.params.id);
 
       if (isNaN(id)) {
@@ -175,6 +97,16 @@ class ProprietariosControllers {
           message: "Id não encontrado",
         });
       }
+
+      const resultado = createProprietarioSchema.safeParse(req.body);
+
+      if (!resultado.success) {
+        return res.status(400).json({
+          errors: resultado.error.flatten().fieldErrors,
+        });
+      }
+
+      const dados = resultado.data;
 
       const proprietario = await prisma.proprietario.findUnique({
         where: {
@@ -188,65 +120,9 @@ class ProprietariosControllers {
         });
       }
 
-      if (!nome) {
-        return res.status(400).json({
-          message: "O campo nome deve ser preenchido",
-        });
-      }
-
-      if (typeof nome !== "string") {
-        return res.status(400).json({
-          message: "O campo nome deve ser preenchido apenas por letras",
-        });
-      }
-
-      nome = nome.trim();
-
-      if (nome.length < 2) {
-        return res.status(400).json({
-          message: "O campo nome deve ter pelo menos 2 letras",
-        });
-      }
-
-      const regexNome = /^[\p{L} ]+$/u;
-
-      if (!regexNome.test(nome)) {
-        return res.status(400).json({
-          message: "Escreva apenas letras",
-        });
-      }
-
-      if (!cpf) {
-        return res.status(400).json({
-          message: "O campo cpf deve ser preenchido",
-        });
-      }
-
-      if (typeof cpf !== "string") {
-        return res.status(400).json({
-          message: "Digite um cpf válido",
-        });
-      }
-
-      cpf = cpf.trim();
-
-      const regex = /^\d+$/;
-
-      if (!regex.test(cpf)) {
-        return res.status(400).json({
-          message: "O campo cpf deve ter apenas números",
-        });
-      }
-
-      if (cpf.length !== 11) {
-        return res.status(400).json({
-          message: "O campo cpf deve ter 11 digítos",
-        });
-      }
-
       const cpfExistente = await prisma.proprietario.findUnique({
         where: {
-          cpf,
+          cpf: dados.cpf,
         },
       });
 
@@ -256,35 +132,9 @@ class ProprietariosControllers {
         });
       }
 
-      if (!telefone) {
-        return res.status(400).json({
-          message: "O campo telefone deve preenchido",
-        });
-      }
-
-      if (typeof telefone !== "string") {
-        return res.status(400).json({
-          message: "Digite um telefone válido",
-        });
-      }
-
-      if (telefone.length <= 11) {
-        return res.status(400).json({
-          message: "O campo deve ter no minímo 10 carácteres",
-        });
-      }
-
-      telefone = telefone.trim();
-
-      if (!regex.test(telefone)) {
-        return res.status(400).json({
-          message: "Escreva apenas numeros",
-        });
-      }
-
       const telefoneExistente = await prisma.proprietario.findUnique({
         where: {
-          telefone,
+          telefone: dados.cpf,
         },
       });
 
@@ -296,17 +146,12 @@ class ProprietariosControllers {
 
       const data = await prisma.proprietario.update({
         where: {
-          id: parseInt(req.params.id),
+          id,
         },
-        data: {
-          nome,
-          cpf,
-          telefone,
-        },
+        data: dados,
       });
       return res.status(200).json(data);
     } catch (error) {
-
       return res.status(500).json({
         message: "Erro interno no servidor",
       });
