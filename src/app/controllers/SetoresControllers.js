@@ -1,10 +1,11 @@
 import prisma from "../../../lib/prisma.js";
+import { createSetorSchema } from "../validations/setores.schema.js";
 
 class SetoresControllers {
   async index(req, res) {
     try {
       const data = await prisma.setor.findMany();
-      res.status(200).json(data);
+      return res.status(200).json(data);
       console.log("GET :: /setores", JSON.stringify(data));
     } catch (error) {
       return res.status(500).json({
@@ -44,28 +45,20 @@ class SetoresControllers {
 
   async create(req, res) {
     try {
-      let { nome } = req.body;
+      const resultado = createSetorSchema.safeParse(req.body);
 
-      if (!nome) {
+      if (!resultado.success) {
         return res.status(400).json({
-          message: "O campo nome do setor deve ser preenchido",
+          errors: resultado.error.flatten().fieldErrors,
         });
       }
 
-      if (typeof nome !== "string") {
-        return res.status(400).json({
-          message: "Escreva um nome válido",
-        });
-      }
-
-      nome = nome.trim().toUpperCase();
+      const dados = resultado.data;
 
       const data = await prisma.setor.create({
-        data: {
-          nome,
-        },
+        data: dados,
       });
-      res.status(201).json(data);
+      return res.status(201).json(data);
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -77,7 +70,6 @@ class SetoresControllers {
   async update(req, res) {
     try {
       const id = parseInt(req.params.id);
-      let { nome } = req.body;
 
       if (isNaN(id)) {
         return res.status(400).json({
@@ -97,34 +89,23 @@ class SetoresControllers {
         });
       }
 
-      if (!nome) {
+      const resultado = createSetorSchema.safeParse(req.body);
+
+      if (!resultado.success) {
         return res.status(400).json({
-          message: "O campo nome do setor deve ser preenchido",
+          errors: resultado.error.flatten().fieldErrors,
         });
       }
 
-      if (typeof nome !== "string") {
-        return res.status(400).json({
-          message: "Escreva um nome válido",
-        });
-      }
+      const dados = resultado.data;
 
-      nome = nome.trim().toUpperCase();
-
-      if (nome.length < 1) {
-        return res.status(400).json({
-          message: "O nome do setor deve ter no minímo 1 carácter",
-        });
-      }
       const data = await prisma.setor.update({
         where: {
-          id: parseInt(req.params.id),
+          id,
         },
-        data: {
-          nome,
-        },
+        data: dados,
       });
-      res.status(200).json(data);
+      return res.status(200).json(data);
     } catch (error) {
       return res.status(500).json({
         message: "Erro interno no servidor",
@@ -216,19 +197,38 @@ class SetoresControllers {
   }
 
   async patch(req, res) {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
-      return res.status(400).json({
-        message: "Id inválido",
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({
+          message: "Id inválido",
+        });
+      }
+
+      const setor = await prisma.setor.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!setor) {
+        return res.status(404).json({
+          message: "Setor não encontrado.",
+        });
+      }
+
+      const data = await prisma.setor.update({
+        where: { id },
+        data: {
+          ativo: true,
+        },
+      });
+      return res.status(200).json(data);
+    } catch (error) {
+      return res.status(500).json({
+        message: "Erro interno no servidor",
       });
     }
-    const data = await prisma.setor.update({
-      where: { id },
-      data: {
-        ativo: true,
-      },
-    });
-    return res.status(200).json(data);
   }
 }
 
