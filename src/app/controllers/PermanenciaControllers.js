@@ -53,16 +53,7 @@ class PermanenciaControllers {
 
   async create(req, res) {
     try {
-      const resultado = createPermanenciaSchema.safeParse(req.body);
-
-      if (!resultado.success) {
-        return res.status(400).json({
-          errors: resultado.error.flatten().fieldErrors,
-        });
-      }
-
-      const dados = resultado.data;
-
+      const dados = req.body;
       const veiculo = await prisma.veiculo.findUnique({
         where: {
           id: dados.veiculoId,
