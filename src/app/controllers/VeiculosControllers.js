@@ -16,13 +16,7 @@ class VeiculosControllers {
 
   async show(req, res) {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message:
-            "Veículo não encontrado, tente novamente com um id existente ou válido",
-        });
-      }
+      const id = req.params.id;
       const veiculo = await prisma.veiculo.findUnique({
         where: {
           id,
@@ -43,15 +37,7 @@ class VeiculosControllers {
 
   async create(req, res) {
     try {
-      const resultado = createVeiculoSchema.safeParse(req.body);
-
-      if (!resultado.success) {
-        return res.status(400).json({
-          errors: resultado.error.flatten().fieldErrors,
-        });
-      }
-
-      const dados = resultado.data;
+      const dados = req.body;
 
       const placaExistente = await prisma.veiculo.findUnique({
         where: {
@@ -90,22 +76,9 @@ class VeiculosControllers {
 
   async update(req, res) {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
 
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
-      const resultado = updateVeiculoSchema.safeParse(req.body);
-
-      if (!resultado.success) {
-        return res.status(400).json({
-          errors: resultado.error.flatten().fieldErrors,
-        });
-      }
-
-      const dados = resultado.data;
+      const dados = req.body;
 
       const veiculo = await prisma.veiculo.findUnique({
         where: {
@@ -146,12 +119,7 @@ class VeiculosControllers {
   }
 
   async destroy(req, res) {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
-      return res.status(400).json({
-        message: "Id inválido",
-      });
-    }
+    const id = req.params.id;
 
     const veiculo = await prisma.veiculo.findUnique({
       where: {

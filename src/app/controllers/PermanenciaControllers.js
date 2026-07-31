@@ -21,13 +21,7 @@ class PermanenciaControllers {
 
   async show(req, res) {
     try {
-      const id = parseInt(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const id = req.params.id;
 
       const data = await prisma.permanencia.findUnique({
         where: {
@@ -142,13 +136,8 @@ class PermanenciaControllers {
   }
   async finalizar(req, res) {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
 
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
       const permanencia = await prisma.permanencia.findUnique({
         where: {
           id,

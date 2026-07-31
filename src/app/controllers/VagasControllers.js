@@ -16,13 +16,7 @@ class VagasControllers {
 
   async show(req, res) {
     try {
-      const id = parseInt(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const id = req.params.id;
 
       const data = await prisma.vaga.findUnique({
         where: {
@@ -45,15 +39,8 @@ class VagasControllers {
 
   async create(req, res) {
     try {
-      const resultado = createVagaSchema.safeParse(req.body);
 
-      if (!resultado.success) {
-        return res.status(400).json({
-          errors: resultado.error.flatten().fieldErrors,
-        });
-      }
-
-      const dados = resultado.data;
+      const dados = req.body;
 
       const setorExistente = await prisma.setor.findUnique({
         where: {
@@ -80,13 +67,7 @@ class VagasControllers {
 
   async update(req, res) {
     try {
-      const id = parseInt(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const id = req.params.id;
 
       const vaga = await prisma.vaga.findUnique({
         where: {
@@ -100,15 +81,7 @@ class VagasControllers {
         });
       }
 
-      const resultado = createVagaSchema.safeParse(req.body);
-
-      if (!resultado.success) {
-        return res.status(400).json({
-          errors: resultado.error.flatten().fieldErrors,
-        });
-      }
-
-      const dados = resultado.data;
+      const dados = req.body;
 
       const setorExistente = await prisma.setor.findUnique({
         where: {
@@ -138,13 +111,7 @@ class VagasControllers {
 
   async destroy(req, res) {
     try {
-      const id = parseInt(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const id = req.params.id;
 
       const vaga = await prisma.vaga.findUnique({
         where: {
@@ -188,15 +155,9 @@ class VagasControllers {
     }
   }
 
-  async patch(req, res) {
+  async ativarVaga(req, res) {
     try {
-      const id = parseInt(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const id = req.params.id;
 
       const vaga = await prisma.vaga.findUnique({
         where: { id },

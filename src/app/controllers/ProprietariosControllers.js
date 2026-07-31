@@ -16,15 +16,10 @@ class ProprietariosControllers {
 
   async show(req, res) {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const id = req.params.id;
       const data = await prisma.proprietario.findUnique({
         where: {
-          id: parseInt(req.params.id),
+          id,
         },
       });
 
@@ -43,15 +38,8 @@ class ProprietariosControllers {
 
   async create(req, res) {
     try {
-      const resultado = createProprietarioSchema.safeParse(req.body);
-
-      if (!resultado.success) {
-        return res.status(400).json({
-          errors: resultado.error.flatten().fieldErrors,
-        });
-      }
-
-      const dados = resultado.data;
+  
+      const dados = req.body;
 
       const cpfExistente = await prisma.proprietario.findUnique({
         where: {
@@ -90,23 +78,9 @@ class ProprietariosControllers {
 
   async update(req, res) {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
 
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id não encontrado",
-        });
-      }
-
-      const resultado = createProprietarioSchema.safeParse(req.body);
-
-      if (!resultado.success) {
-        return res.status(400).json({
-          errors: resultado.error.flatten().fieldErrors,
-        });
-      }
-
-      const dados = resultado.data;
+      const dados = req.body;
 
       const proprietario = await prisma.proprietario.findUnique({
         where: {
@@ -160,13 +134,7 @@ class ProprietariosControllers {
 
   async destroy(req, res) {
     try {
-      const id = parseInt(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const id = req.params.id;
 
       const proprietario = await prisma.proprietario.findUnique({
         where: {

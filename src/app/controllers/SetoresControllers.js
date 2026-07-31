@@ -16,13 +16,7 @@ class SetoresControllers {
 
   async show(req, res) {
     try {
-      const id = parseInt(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const id = req.params.id;
 
       const data = await prisma.setor.findUnique({
         where: {
@@ -45,15 +39,7 @@ class SetoresControllers {
 
   async create(req, res) {
     try {
-      const resultado = createSetorSchema.safeParse(req.body);
-
-      if (!resultado.success) {
-        return res.status(400).json({
-          errors: resultado.error.flatten().fieldErrors,
-        });
-      }
-
-      const dados = resultado.data;
+      const dados = req.body;
 
       const data = await prisma.setor.create({
         data: dados,
@@ -69,13 +55,7 @@ class SetoresControllers {
 
   async update(req, res) {
     try {
-      const id = parseInt(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const id = req.params.id;
 
       const setor = await prisma.setor.findUnique({
         where: {
@@ -89,15 +69,7 @@ class SetoresControllers {
         });
       }
 
-      const resultado = createSetorSchema.safeParse(req.body);
-
-      if (!resultado.success) {
-        return res.status(400).json({
-          errors: resultado.error.flatten().fieldErrors,
-        });
-      }
-
-      const dados = resultado.data;
+      const dados = req.body;
 
       const data = await prisma.setor.update({
         where: {
@@ -115,13 +87,7 @@ class SetoresControllers {
 
   async destroy(req, res) {
     try {
-      const id = parseInt(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const id = req.params.id;
 
       const setor = await prisma.setor.findUnique({
         where: {
@@ -196,14 +162,9 @@ class SetoresControllers {
     }
   }
 
-  async patch(req, res) {
+  async ativarSetor(req, res) {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({
-          message: "Id inválido",
-        });
-      }
+      const id = req.params.id;
 
       const setor = await prisma.setor.findUnique({
         where: {
