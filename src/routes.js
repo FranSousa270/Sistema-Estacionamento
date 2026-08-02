@@ -51,7 +51,7 @@ routes.patch('/vagas/:id/ativar', validateId,  (req, res) => vagas.ativarVaga(re
 
 routes.get('/permanencias', (req, res) => permanencias.index(req, res));
 routes.get('/permanencias/:id', validateId,  (req, res) => permanencias.show(req, res));
-routes.put('/permanencias/:id', validateId,  (req, res) => permanencias.finalizar(req, res));
+routes.patch('/permanencias/:id/finalizar', validateId,  (req, res) => permanencias.finalizar(req, res));
 routes.post('/permanencias', validate(createPermanenciaSchema), (req, res) => permanencias.create(req, res));
 
 
