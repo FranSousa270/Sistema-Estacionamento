@@ -46,7 +46,7 @@ routes.get('/vagas', (req, res) => vagas.index(req, res));
 routes.get('/vagas/:id', validateId,  (req, res) => vagas.show(req, res));
 routes.put('/vagas/:id', validateId,  validate(createVagaSchema), (req, res) => vagas.update(req, res));
 routes.post('/vagas', validate(createVagaSchema), (req, res) => vagas.create(req, res));
-routes.delete('/vagas/:id', validateId,  (req, res) => vagas.destroy(req, res));
+routes.patch('/vagas/:id/desativar', validateId,  (req, res) => vagas.desativarVaga(req, res));
 routes.patch('/vagas/:id/ativar', validateId,  (req, res) => vagas.ativarVaga(req, res));
 
 routes.get('/permanencias', (req, res) => permanencias.index(req, res));

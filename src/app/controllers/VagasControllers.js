@@ -109,7 +109,7 @@ class VagasControllers {
     }
   }
 
-  async destroy(req, res) {
+  async desativarVaga(req, res) {
     try {
       const id = req.params.id;
 
