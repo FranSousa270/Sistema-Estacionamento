@@ -85,7 +85,7 @@ class SetoresControllers {
     }
   }
 
-  async destroy(req, res) {
+  async desativarSetor(req, res) {
     try {
       const id = req.params.id;
 

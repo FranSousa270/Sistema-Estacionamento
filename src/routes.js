@@ -39,7 +39,7 @@ routes.get('/setores', (req, res) => setores.index(req, res));
 routes.get('/setores/:id', validateId, (req, res) => setores.show(req, res));
 routes.put('/setores/:id', validateId,  validate(createSetorSchema), (req, res) => setores.update(req, res));
 routes.post('/setores', validate(createSetorSchema), (req, res) => setores.create(req, res));
-routes.delete('/setores/:id', validateId,  (req, res) => setores.destroy(req, res));
+routes.patch('/setores/:id', validateId,  (req, res) => setores.desativarSetor(req, res));
 routes.patch('/setores/:id/ativar', validateId,  (req, res) => setores.ativarSetor(req, res));
 
 routes.get('/vagas', (req, res) => vagas.index(req, res));
