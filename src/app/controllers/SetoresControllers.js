@@ -1,3 +1,4 @@
+import { da } from "zod/v4/locales";
 import prisma from "../../../lib/prisma.js";
 import { createSetorSchema } from "../validations/setores.schema.js";
 
@@ -40,10 +41,24 @@ class SetoresControllers {
   async create(req, res) {
     try {
       const dados = req.body;
+      const setor = await prisma.setor.findFirst({
+        where: {
+          nome: dados.nome
+        }
+      });
+
+
+      if(setor){
+        return res.status(400).json({
+          message: "Nome do setor já existe",
+        });
+      }
 
       const data = await prisma.setor.create({
         data: dados,
       });
+
+  
       return res.status(201).json(data);
     } catch (error) {
       console.log(error);
@@ -135,6 +150,7 @@ class SetoresControllers {
           message: "Não é possível desativar um setor com vagas ocupadas",
         });
       }
+      
 
       await prisma.vaga.updateMany({
         where: {
