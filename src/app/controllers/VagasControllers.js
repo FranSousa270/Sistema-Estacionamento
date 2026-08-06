@@ -54,6 +54,18 @@ class VagasControllers {
         });
       }
 
+      const vagaExistente = await prisma.vaga.findFirst({
+        where: {
+          numero: dados.numero
+        }
+      })
+
+      if(vagaExistente){
+        return res.status(404).json({
+          message: "Essa vaga já existe",
+        });
+      }
+
       const data = await prisma.vaga.create({
         data: dados,
       });
