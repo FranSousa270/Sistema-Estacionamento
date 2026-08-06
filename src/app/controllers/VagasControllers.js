@@ -56,7 +56,8 @@ class VagasControllers {
 
       const vagaExistente = await prisma.vaga.findFirst({
         where: {
-          numero: dados.numero
+          numero: dados.numero,
+          setorId: dados.setorId
         }
       })
 
